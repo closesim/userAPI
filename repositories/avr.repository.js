@@ -1,6 +1,7 @@
 const AVRRespository = module.exports;
 
 const axios = require('axios');
+const { AVR_API_KEY } = require('../configs/app');
 
 AVRRespository.searchByCoordinates = async (lat, lon, radius) => {
   const options = {
@@ -8,7 +9,7 @@ AVRRespository.searchByCoordinates = async (lat, lon, radius) => {
     url: 'https://aviation-reference-data.p.rapidapi.com/airports/search',
     params: { lat, lon, radius },
     headers: {
-      'X-RapidAPI-Key': '259b4e7ca4msh8aa30d4c92c31f1p19ac03jsnbe37f40fa497',
+      'X-RapidAPI-Key': AVR_API_KEY,
       'X-RapidAPI-Host': 'aviation-reference-data.p.rapidapi.com',
     },
   };
