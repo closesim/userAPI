@@ -2,15 +2,14 @@ const UserRepository = module.exports;
 
 const UserModel = require('../models/user.model');
 
-UserRepository.getById = (id) => UserModel.find({ id }).lean().exec();
+UserRepository.getByName = (name) => UserModel.findOne({ name });
 
-UserRepository.createUser = (userData) => {
+UserRepository.createUser = async (userData) => {
   const userDetails = new UserModel({
     ...userData,
   });
 
-  userDetails.save((err, user) => {
-    if (err) return console.error(err);
-    return console.log(`${user.name} saved to user collection.`);
-  });
+  await userDetails.save();
+
+  return userDetails;
 };
