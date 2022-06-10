@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const redis = require('../configs/cache');
+const TransRepository = require('../repositories/transactions.repository');
 
 const AuthMiddleware = module.exports;
 
@@ -18,6 +19,13 @@ AuthMiddleware.authenticateToken = (async (req, res, next) => {
     if (await redis.get(`loggin_blacklist:${userName}`)) {
       return res.sendStatus(401);
     }
+
+    await TransRepository.logTransaction({
+      user_name: userName,
+      request: req.body,
+      resource: `${req.method} ${req.originalUrl}`,
+      date: new Date(),
+    });
 
     req.user = userName;
     return next();

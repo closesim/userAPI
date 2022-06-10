@@ -2,6 +2,7 @@ const UserController = module.exports;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const UserRepository = require('../repositories/user.repository');
+const TransRepository = require('../repositories/transactions.repository');
 const redis = require('../configs/cache');
 
 function generateJWT(userName) {
@@ -14,10 +15,14 @@ function generateJWT(userName) {
 
 UserController.generate = (res, req) => {
   const { name } = req.body;
-  res.send(generateJWT(name));
+  return res.send(generateJWT(name));
 };
 
-UserController.validate = (res) => res.sendStatus(200);
+UserController.searchLogs = async (req, res) => {
+  const results = await TransRepository.getByName(req.user);
+
+  return res.status(200).send(results);
+};
 
 UserController.create = async (req, res) => {
   const { name, password } = req.body;
