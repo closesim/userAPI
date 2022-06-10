@@ -25,7 +25,7 @@ UserController.create = async (req, res) => {
   const { name, password } = req.body;
 
   if (!name || !password) {
-    res.status(400).send('Name or password missing');
+    return res.status(400).send('Name or password missing');
   }
 
   const result = await UserRepository.getByName(name);
