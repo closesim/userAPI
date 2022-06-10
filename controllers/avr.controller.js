@@ -9,6 +9,7 @@ AVRController.search = async (req, res) => {
     return res.status(400).send('Invalid Coordinates');
   }
 
-  return AVRRepository.searchByCoordinates(lat, lon, radius).then((response) => res.send(response))
+  return AVRRepository.searchByCoordinates(lat, lon, radius)
+    .then((response) => res.status(200).send(response))
     .catch((error) => res.status(500).send(error));
 };

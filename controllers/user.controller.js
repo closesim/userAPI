@@ -2,16 +2,14 @@ const UserController = module.exports;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const UserRepository = require('../repositories/user.repository');
+const redis = require('../configs/cache');
 
-function generateJWT(user) {
+function generateJWT(userName) {
   const jwtSecret = process.env.JWT_SECRET;
 
-  const token = jwt.sign({
-    time: Number(Date()),
-    user_name: user.name,
+  return jwt.sign({
+    user_name: userName,
   }, jwtSecret, { expiresIn: '24h' });
-
-  return token;
 }
 
 UserController.generate = (res, req) => {
@@ -38,7 +36,7 @@ UserController.create = async (req, res) => {
 
   const createduser = await UserRepository.createUser({ name, password: hashedPassword });
 
-  const token = generateJWT({ name });
+  const token = generateJWT(name);
 
   return res.status(200).send({ ...createduser, token });
 };
@@ -57,8 +55,18 @@ UserController.login = async (req, res) => {
   const hashResult = await bcrypt.compare(password, user.password);
 
   if (hashResult) {
-    return res.send({ token: generateJWT(user.name) });
+    await redis.del(`loggin_blacklist:${name}`);
+
+    return res.send({ token: generateJWT(name) });
   }
 
   return res.status(403).send('Incorrect password');
+};
+
+UserController.logout = async (req, res) => {
+  await redis.set(`loggin_blacklist:${req.user}`, 'loggedoff', {
+    EX: 24 * 60 * 60 * 60,
+  });
+
+  return res.send('Logged out successfully');
 };

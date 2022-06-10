@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
+const redis = require('../configs/cache');
 
 const AuthMiddleware = module.exports;
 
-AuthMiddleware.authenticateToken = ((req, res, next) => {
+AuthMiddleware.authenticateToken = (async (req, res, next) => {
   const jwtHeader = process.env.TOKEN_HEADER;
   const jwtSecret = process.env.JWT_SECRET;
 
@@ -12,15 +13,15 @@ AuthMiddleware.authenticateToken = ((req, res, next) => {
 
   if (token == null) return res.sendStatus(401);
   try {
-    jwt.verify(token, jwtSecret, (err, user) => {
-      if (err) return res.sendStatus(401);
+    const { user_name: userName } = jwt.verify(token, jwtSecret);
 
-      req.user = user;
-      return next();
-    });
+    if (await redis.get(`loggin_blacklist:${userName}`)) {
+      return res.sendStatus(401);
+    }
+
+    req.user = userName;
+    return next();
   } catch (error) {
     return res.status(401);
   }
-
-  return res.status(401);
 });

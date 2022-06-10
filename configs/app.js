@@ -20,12 +20,6 @@ assert(PORT, 'PORT is required');
 assert(JWT_SECRET, 'JWT_SECRET is required');
 assert(TOKEN_HEADER, 'TOKEN_HEADER is required');
 
-if (!MONGODB_URI) {
-  assert(MONGODB_DB, 'MONGODB_DB is required');
-  assert(MONGODB_USER, 'MONGODB_USER is required');
-  assert(MONGODB_PASSWORD, 'MONGODB_PASSWORD is required');
-}
-
 module.exports = {
   PORT,
   API_BASE,
